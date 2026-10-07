@@ -115,13 +115,13 @@ public class PeerNode {
             out.write(data);
             out.flush();
 
-            // The requester ID can be extracted from HELLO.
+            // The requester ID will be extracted from HELLO.
             String requesterId = hello.substring(6);
             PeerInfo requester = discovery.findPeer(requesterId);
             if (requester != null) requester.bytesSentToPeer += data.length;
 
         } catch (Exception e) {
-            // A peer leaving mid-transfer is expected; the downloader will retry.
+            // A peer leaving mid-transfer is expected; the downloader will retry again.
         }
     }
 
