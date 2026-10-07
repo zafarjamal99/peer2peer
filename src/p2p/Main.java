@@ -32,7 +32,7 @@ public class Main {
         node.start();
 
         System.out.println();
-        System.out.println("P2P File Sharing Peer");
+        System.out.println("P2P File Sharing Peers");
         System.out.println("---------------------");
         System.out.println("Name: " + name);
         System.out.println("TCP port: " + port);

@@ -136,7 +136,7 @@ public class PeerNode {
                 case "peers" -> {
                     Collection<PeerInfo> peers = discovery.getPeers();
                     if (peers.isEmpty()) {
-                        System.out.println("No peers discovered.");
+                        System.out.println("No peers found.");
                     } else {
                         for (PeerInfo p : peers) {
                             System.out.println("- " + p + " | files=" + p.advertisements().size());
