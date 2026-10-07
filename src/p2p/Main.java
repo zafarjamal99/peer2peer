@@ -4,6 +4,7 @@ import java.nio.file.*;
 import java.net.*;
 import java.util.*;
 
+// Application entry point
 public class Main {
     public static void main(String[] args) throws Exception {
         int port = 5001;
@@ -36,7 +37,7 @@ public class Main {
         System.out.println("---------------------");
         System.out.println("Name: " + name);
         System.out.println("TCP port: " + port);
-        System.out.println("Type 'help' for commands.");
+        System.out.println("Typing 'help' for commands.");
         System.out.println();
 
         Scanner scanner = new Scanner(System.in);

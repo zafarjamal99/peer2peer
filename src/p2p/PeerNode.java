@@ -111,7 +111,7 @@ public class PeerNode {
             byte[] data = file.readPiece(pieceIndex);
             String hash = SharedFile.hex(SharedFile.sha256Bytes(data, 0, data.length));
 
-            out.writeUTF("PIECE|" + pieceIndex + "|" + data.length + "|" + hash);
+            out.writeUTF("PIECES|" + pieceIndex + "|" + data.length + "|" + hash);
             out.write(data);
             out.flush();
 
