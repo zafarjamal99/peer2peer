@@ -33,7 +33,11 @@ public class FileManager {
         SharedFile existing = files.get(ad.fileId);
         if (existing != null) return existing;
 
-        Path output = Path.of("downloads", ad.fileName + "." + ad.fileId.substring(0, 8) + ".part");
+        Path output = Path.of(
+                "downloads",
+                ad.fileName + "." + ad.fileId.substring(0, 8) + ".part"
+        );
+
         SharedFile partial = SharedFile.createPartial(
                 ad.fileId,
                 ad.fileName,
@@ -42,9 +46,35 @@ public class FileManager {
                 ad.pieceCount,
                 ad.wholeHash,
                 ad.pieceHashes,
-                output);
+                output
+        );
+
         files.put(ad.fileId, partial);
         return partial;
+    }
+
+    public synchronized List<SharedFile> shareDirectory(Path directory) throws IOException {
+        Files.createDirectories(directory);
+
+        List<SharedFile> shared = new ArrayList<>();
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(directory)) {
+            for (Path path : stream) {
+                if (Files.isRegularFile(path)) {
+                    shared.add(share(path));
+                }
+            }
+        }
+
+        return shared;
+    }
+
+    public synchronized boolean unshare(String fileId) {
+        return files.remove(fileId) != null;
+    }
+
+    public synchronized boolean contains(String fileId) {
+        return files.containsKey(fileId);
     }
 
     public static String sha256(Path path) throws IOException {
@@ -58,10 +88,14 @@ public class FileManager {
         try (InputStream in = new BufferedInputStream(Files.newInputStream(path))) {
             byte[] buffer = new byte[1024 * 1024];
             int n;
+
             while ((n = in.read(buffer)) >= 0) {
-                if (n > 0) md.update(buffer, 0, n);
+                if (n > 0) {
+                    md.update(buffer, 0, n);
+                }
             }
         }
+
         return SharedFile.hex(md.digest());
     }
 }
