@@ -9,13 +9,21 @@ public class PeerInfo {
     public final String host;
     public final int port;
     public final int discoveryPort;
+
     public volatile long lastSeen;
     public volatile long bytesReceivedFromPeer;
     public volatile long bytesSentToPeer;
 
-    private final Map<String, Advertisement> files = new ConcurrentHashMap<>();
+    private final Map<String, Advertisement> files =
+            new ConcurrentHashMap<>();
 
-    public PeerInfo(String peerId, String name, String host, int port, int discoveryPort) {
+    public PeerInfo(
+            String peerId,
+            String name,
+            String host,
+            int port,
+            int discoveryPort) {
+
         this.peerId = peerId;
         this.name = name;
         this.host = host;
@@ -37,9 +45,37 @@ public class PeerInfo {
         return files.get(fileId);
     }
 
-    public boolean hasPiece(String fileId, int pieceIndex) {
+    public boolean hasPiece(
+            String fileId,
+            int pieceIndex) {
+
         Advertisement ad = files.get(fileId);
-        return ad != null && ad.hasPiece(pieceIndex);
+
+        return ad != null &&
+                ad.hasPiece(pieceIndex);
+    }
+
+    // Number of pieces this peer currently advertises
+    // for the requested file.
+    public int availablePieces(String fileId) {
+        Advertisement ad = files.get(fileId);
+
+        return ad == null
+                ? 0
+                : ad.availableCount();
+    }
+
+    // Returns a copy of the advertised piece bitmap.
+    public BitSet pieceBitmap(String fileId) {
+        Advertisement ad = files.get(fileId);
+
+        return ad == null
+                ? new BitSet()
+                : ad.bitmapCopy();
+    }
+
+    public boolean hasFile(String fileId) {
+        return files.containsKey(fileId);
     }
 
     @Override
@@ -55,6 +91,7 @@ public class PeerInfo {
         public final int pieceCount;
         public final String wholeHash;
         public final List<String> pieceHashes;
+
         private final BitSet bitmap;
 
         public Advertisement(
@@ -66,6 +103,7 @@ public class PeerInfo {
                 String wholeHash,
                 List<String> pieceHashes,
                 BitSet bitmap) {
+
             this.fileId = fileId;
             this.fileName = fileName;
             this.fileSize = fileSize;
@@ -86,6 +124,10 @@ public class PeerInfo {
 
         public BitSet bitmapCopy() {
             return (BitSet) bitmap.clone();
+        }
+
+        public boolean isComplete() {
+            return bitmap.cardinality() == pieceCount;
         }
     }
 }
