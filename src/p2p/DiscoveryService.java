@@ -353,15 +353,24 @@ public class DiscoveryService {
             // Ignore malformed discovery packets.
         }
     }
+private void removeStalePeers() {
+    long now = System.currentTimeMillis();
 
-    private void removeStalePeers() {
-        long cutoff =
-                System.currentTimeMillis() - 7000;
+    int removed = 0;
 
-        peers.values().removeIf(
-                p -> p.lastSeen < cutoff);
+    for (Map.Entry<String, PeerInfo> entry : peers.entrySet()) {
+        if (entry.getValue().isStale(now)) {
+            if (peers.remove(entry.getKey(), entry.getValue())) {
+                removed++;
+            }
+        }
     }
 
+    if (removed > 0) {
+        System.out.println(
+                "[DISCOVERY] Removed " + removed + " stale peer(s)");
+    }
+}
     public Collection<PeerInfo> getPeers() {
         removeStalePeers();
         return new ArrayList<>(peers.values());
