@@ -20,7 +20,9 @@ public class FileManager {
 
     public synchronized SharedFile findByName(String fileName) {
         for (SharedFile f : files.values()) {
-            if (f.fileName.equals(fileName)) return f;
+            if (f.fileName.equals(fileName)) {
+                return f;
+            }
         }
         return null;
     }
@@ -29,13 +31,20 @@ public class FileManager {
         return new ArrayList<>(files.values());
     }
 
-    public synchronized SharedFile createPartial(PeerInfo.Advertisement ad) throws IOException {
+    public synchronized SharedFile createPartial(
+            PeerInfo.Advertisement ad) throws IOException {
+
         SharedFile existing = files.get(ad.fileId);
-        if (existing != null) return existing;
+
+        if (existing != null) {
+            return existing;
+        }
 
         Path output = Path.of(
                 "downloads",
-                ad.fileName + "." + ad.fileId.substring(0, 8) + ".part"
+                ad.fileName + "." +
+                        ad.fileId.substring(0, 8) +
+                        ".part"
         );
 
         SharedFile partial = SharedFile.createPartial(
@@ -50,15 +59,20 @@ public class FileManager {
         );
 
         files.put(ad.fileId, partial);
+
         return partial;
     }
 
-    public synchronized List<SharedFile> shareDirectory(Path directory) throws IOException {
+    public synchronized List<SharedFile> shareDirectory(
+            Path directory) throws IOException {
+
         Files.createDirectories(directory);
 
         List<SharedFile> shared = new ArrayList<>();
 
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(directory)) {
+        try (DirectoryStream<Path> stream =
+                     Files.newDirectoryStream(directory)) {
+
             for (Path path : stream) {
                 if (Files.isRegularFile(path)) {
                     shared.add(share(path));
@@ -77,16 +91,24 @@ public class FileManager {
         return files.containsKey(fileId);
     }
 
+    /*
+     * Calculate SHA-256 hash of an entire file.
+     */
     public static String sha256(Path path) throws IOException {
         MessageDigest md;
+
         try {
             md = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
             throw new IOException(e);
         }
 
-        try (InputStream in = new BufferedInputStream(Files.newInputStream(path))) {
+        try (InputStream in =
+                     new BufferedInputStream(
+                             Files.newInputStream(path))) {
+
             byte[] buffer = new byte[1024 * 1024];
+
             int n;
 
             while ((n = in.read(buffer)) >= 0) {
@@ -97,5 +119,34 @@ public class FileManager {
         }
 
         return SharedFile.hex(md.digest());
+    }
+
+    /*
+     * Verify an entire file against an expected SHA-256 hash.
+     */
+    public static boolean verifySha256(
+            Path path,
+            String expectedHash) throws IOException {
+
+        String actualHash = sha256(path);
+
+        return actualHash.equalsIgnoreCase(expectedHash);
+    }
+
+    /*
+     * Verify a single piece against its expected SHA-256 hash.
+     */
+    public static boolean verifyPiece(
+            byte[] data,
+            String expectedHash) {
+
+        String actualHash =
+                SharedFile.hex(
+                        SharedFile.sha256Bytes(
+                                data,
+                                0,
+                                data.length));
+
+        return actualHash.equalsIgnoreCase(expectedHash);
     }
 }
