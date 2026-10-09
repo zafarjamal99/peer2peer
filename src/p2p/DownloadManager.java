@@ -80,6 +80,7 @@ public class DownloadManager {
             });
         }
 
+      
         try {
             latch.await();
         } catch (InterruptedException e) {
@@ -91,9 +92,11 @@ public class DownloadManager {
             finish(file);
         } else {
             System.out.println("[DOWNLOAD] Stopped with " +
-                    file.completedPieces() + "/" + file.pieceCount + " pieces.");
+                    file.completedPieces() + "/" + file.pieceCount +
+                    " pieces completed. Remaining pieces may need more available peers.");
         }
     }
+    
 
     private void workerLoop(SharedFile file, Set<Integer> claimedPieces) {
         Set<String> failedPeersForPiece = new HashSet<>();
