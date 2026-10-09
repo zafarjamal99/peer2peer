@@ -206,7 +206,7 @@ public class DownloadManager {
 
             if (parts.length != 4 || !"PIECE".equals(parts[0])) {
                 throw new IOException(header.startsWith("ERROR|")
-                        ? header.substring(6) : "invalid piece response");
+                        ? header.substring(6): "invalid piece response");
             }
 
             int index = Integer.parseInt(parts[1]);
