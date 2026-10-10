@@ -232,3 +232,35 @@ docs: add LAN setup and demo instructions
 ## Limitations / scaling discussion
 
 This is intentionally a small educational BitTorrent-style implementation. It does not implement a DHT, NAT traversal, encryption, choking/unchoking, persistent peer reputation, or tracker redundancy. UDP discovery is LAN-scoped and multicast-dependent. For internet-scale deployment, a DHT or redundant tracker, authenticated metadata, congestion-aware scheduling, NAT traversal and stronger peer incentives would be required.
+
+## Day 4: Three-Peer Transfer Setup
+### Prerequisites
+- Java installed on each device.
+- All peer devices connected to the same reachable Wi-Fi network or LAN.
+- Firewall permissions configured for discovery and file-transfer ports.
+
+### Compile
+Run this command from the project directory on each device:
+
+```powershell
+.\scripts\compile.bat
+```
+
+### Three-Peer Test Procedure
+1. Compile the project on Peer A, Peer B, and Peer C.
+2. Start all three peers using the project's existing startup procedure.
+3. Ensure each peer has a unique peer ID and appropriate TCP port.
+4. Share a test file from Peer A.
+5. Verify that Peer B and Peer C discover Peer A.
+6. Download the file from Peer A to Peer B.
+7. Download the same file from Peer A to Peer C.
+8. Compare the SHA-256 hashes of the original and downloaded files.
+
+### Expected Results
+- All three peers discover one another.
+- The shared file is visible to the other peers.
+- Both downloads complete successfully.
+- The original and downloaded file hashes match.
+
+### Test Record
+Record peer IDs, the test file name, download results, hash comparisons, and any errors observed.
